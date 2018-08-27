@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+</head>
+
+<div class="btn-toolbar">
+	<button class="btn btn-primary" onclick="update()">
+		<i class="icon-save"></i> 保存
+	</button>
+    <a href="#" class="btn" onclick="route('/role/list.html')">返回</a>
+</div>
+
+<div class="well">
+	<div id="myTabContent" class="tab-content">
+		<div class="tab-pane active in" id="home">
+			<form>
+			    <label>角色名称</label> 
+				<input type="text" class="input-xlarge" id="name">
+				<label>优先级</label> 
+				<input type="text" class="input-xlarge" id="priority">
+				<label>所属组织</label> 
+				<input type="text"  class="input-xlarge" id="treeValue" readonly="readonly" onclick="showMenu()">
+				<div id="ztree"></div>
+				<label>状态 </label> 
+				<div>
+					<label style="">
+						<input type="radio" style="vertical-align:top;" name="enable" value="1">&nbsp;启用
+						&nbsp;&nbsp;
+						<input type="radio" style="vertical-align:top;" name="enable" value="-1">&nbsp;停用
+					</label>
+				</div>
+			    <label>备注</label>
+				<textarea rows="3" class="input-xlarge" id="remark"></textarea>
+			</form>
+		</div>
+	</div>
+</div>
+<script>
+
+	$("#ztree").load("/pages/organ/tree_multi.html");
+
+	$(function(){
+		 detail();
+	});
+	
+	function detail(){
+		$.ajax({
+          url: sever_addr + "/role/get",
+          type: "post",
+          dataType: "json",
+          data: {'id':localStorage.getItem("id")},
+          success: function(data) {
+        	  $("#name").val(data.data.name);
+        	  $("#priority").val(data.data.priority);
+        	  $("#treeValue").val(data.data.values);
+        	  $("#remark").val(data.data.remark);
+        	  
+        	  if(data.data.enable == true){
+        		  radioChecked("enable","1");
+        	  }else{
+        		  radioChecked("enable","-1");
+        	  }
+        	  
+          },
+          error: function() {alert("系统出错了！");}
+        });
+	}
+	
+	function getData(){
+		var data = new Object();
+		var enable = radioVal("enable");
+		data.enable = (enable == 1 || enable == "1") ? true :false;
+		data.id = localStorage.getItem("id");
+		data.name = $("#name").val();
+		data.priority = $("#priority").val();
+		data.remark = $("#remark").val();
+		data.values = $("#nodeIds").val();
+		return data;
+	}
+	
+	function update(){
+		$.ajax({
+          url: sever_addr + "/role/modify",
+          type: "post",
+          dataType: "json",
+          data: getData(),
+          success: function(data) {
+        	if(resultHandler(data)) {
+        		route('/role/list.html');
+      	    }
+          },
+          error: function(data) {toastr.error(data.msg);}
+        });
+	}
+</script>
+</html>
+

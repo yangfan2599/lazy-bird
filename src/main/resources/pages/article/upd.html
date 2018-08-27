@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script type="text/javascript" charset="utf-8" src="../../plugin/editor/ueditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../plugin/editor/ueditor.all.min.js"> </script>
+<script type="text/javascript" charset="utf-8" src="../..//plugin/editor/lang/zh-cn/zh-cn.js"></script>
+</head>
+
+<div class="btn-toolbar">
+	<button class="btn btn-primary" onclick="update()">
+		<i class="icon-save"></i> 保存
+	</button>
+    <a href="#" class="btn" onclick="route('/article/list.html')">返回</a>
+</div>
+
+<div class="well">
+	<div id="myTabContent" class="tab-content">
+		<div class="tab-pane active in" id="home">
+			<form>
+			    <label>标题</label> 
+				<input type="text" class="input-xlarge" id="title"> 
+				<label>类型</label> 
+				<select id="type" class="input-xlarge">
+			    </select>
+			    <label>作者</label> 
+				<input type="text" class="input-xlarge" id="author">
+			    <label>文章摘要</label>
+				<textarea rows="3" class="input-xlarge" id="summary"></textarea>
+				<label>状态 </label> 
+				<div>
+					<label>
+						<input type="radio" style="vertical-align:top;" name="enable" value="1">&nbsp;启用
+						&nbsp;&nbsp;
+						<input type="radio" style="vertical-align:top;" name="enable" value="-1">&nbsp;停用
+					</label>
+				</div>
+				<label>内容</label>
+				<script id="editor" type="text/plain" style="width:98%;height:500px;"></script>
+			</form>
+		</div>
+	</div>
+</div>
+<script>
+    var ue = UE.getEditor('editor');
+	  
+	$(function(){
+		initType();
+	});
+	
+	function initType(){
+		$.ajax({
+	          url: sever_addr + "/dictionary/query",
+	          type: "post",
+	          dataType: "json",
+	          data: {'type':dict_article},
+	          success: function(data) {
+	        		$("#type").empty();
+	        		$("#type").append("<option value=''>请选择</option>");
+	  	            $.each(data.data, function(index, em) {
+	  	        		$("#type").append("<option value='1'>"+em.name+"</option>");
+	  	            });
+	  	            
+	  	          detail();
+	          },
+	          error: function(data) {
+	        	  toastr.error(data.msg);
+	          }
+	    });
+	}
+	
+	function detail(){
+		$.ajax({
+          url: sever_addr + "/article/get",
+          type: "post",
+          dataType: "json",
+          data: {'id':localStorage.getItem("id")},
+          success: function(data) {
+        	  $("#title").val(data.data.title);
+        	  $("#type").val(data.data.type);
+        	  $("#author").val(data.data.author);
+        	  $("#summary").val(data.data.summary);
+        	  
+        	  if(data.data.enable == true){
+        		  radioChecked("enable","1");
+        	  }else{
+        		  radioChecked("enable","-1");
+        	  }
+          },
+          error: function() {alert("系统出错了！");}
+        });
+	}
+	
+	
+	function getData(){
+		var data = new Object();
+		var enable = radioVal("enable");
+		data.enable = (enable == 1 || enable == "1") ? true :false;
+		data.id = localStorage.getItem("id");
+		data.name = $("#name").val();
+		data.priority = $("#priority").val();
+		data.remark = $("#remark").val();
+		data.values = $("#nodeIds").val();
+		return data;
+	}
+	
+	function update(){
+		$.ajax({
+          url: sever_addr + "/article/modify",
+          type: "post",
+          dataType: "json",
+          data: getData(),
+          success: function(data) {
+        	if(resultHandler(data)) {
+        		route('/article/list.html');
+      	    }
+          },
+          error: function(data) {toastr.error(data.msg);}
+        });
+	}
+</script>
+</html>
+

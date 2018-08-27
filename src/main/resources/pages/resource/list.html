@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+</head>
+
+<div class="search-well">
+    <form class="form-inline"> 
+    	<button class="btn btn-primary" onclick="route('/resource/add.html')">
+		<i class="icon-plus"></i> 添加
+	    </button>
+        <input class="input-large" placeholder="名称" type="text" id="name">
+        <button class="btn" type="button" onclick="query()"><i class="icon-search"></i> 搜索</button>
+        <button class="btn" type="button" onclick="tree()"><i class="icon-list-ul"></i> 资源树</button>
+    </form>
+</div>
+
+<div class="well">
+	<table class="table">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>名称</th>
+				<th>所属上级</th>
+				<th>资源类型</th>
+				<th>资源标识</th>
+				<th>状态</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody id="datas"></tbody>
+	</table>
+</div>
+<div class="pagination" id="page"></div>
+<div id="dialog"></div>
+<script>
+
+	$("#page").load("/page.html");
+	$("#dialog").load("../dialog.html");
+	
+	$(function(){
+		query();
+	});
+	
+	function condition(){
+		var param = new Object();
+		param.name = $("#name").val();
+		return param;
+	}
+	
+	function query(){
+		$.ajax({
+          url: sever_addr + "/resource/query",
+          type: "post",
+          dataType: "json",
+          data: condition(),
+          success: function(data) {
+        	    $("#datas").empty();
+	            $.each(data.data, function(index, em) {
+	            	var tr = $("<tr id="+em.id+"></tr>");
+	            	var td1 = $("<td>"+ (index + 1) +"</td>");
+	        		var td2 = $("<td>"+em.name+"</td>");
+	        		var td3 = $("<td>"+(em.parent == null ? "--" : em.parent)+"</td>");
+	        		var td4 = $("<td>"+(em.type == 1 ? "导航" : "按钮")+"</td>");
+	        		var td5 = $("<td>"+(em.resource == null ? "--" : em.resource)+"</td>");
+	        		var td6 = $("<td>"+(em.enable == true ? "启用" : "停用")+"</td>");
+	        		var td7 = $("<td></td>");
+	        		var op_vi = $("<a href='javascript:void(0)' onclick='detail("+em.id+")' class='operations'><i class='icon-pencil'></i> &nbsp;</a>");
+	        		var op_rm = $("<a href='javascript:void(0)' onclick='show("+em.id+")' class='operations'><i class='icon-remove'></i> &nbsp;</a> ");
+	        		td7.append(op_vi);
+	        		td7.append(op_rm);
+	        		tr.append(td1);
+	        		tr.append(td2);
+	        		tr.append(td3);
+	        		tr.append(td4);
+	        		tr.append(td5);
+	        		tr.append(td6);
+	        		tr.append(td7);
+	        		$("#datas").append(tr);
+	            });
+          },
+          error: function(data) {toastr.error(data.msg);}
+        });
+	}
+	
+	function detail(id){
+		localStorage.setItem("id",id);
+		route('/resource/upd.html');
+	}
+	
+	function show(id){
+		localStorage.setItem("select_id",id);
+		localStorage.setItem("routeDel","/resource/remove");
+		$('#myModal').modal('show');
+	}
+	
+</script>
+</html>
+
+

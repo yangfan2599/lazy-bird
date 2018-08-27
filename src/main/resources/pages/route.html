@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="cn" >
+<head>
+<meta charset="utf-8"/>
+</head>
+<div class="sidebar-nav" id="menu"></div>
+<script>
+$(function(){
+	initMenu();
+});
+
+function initMenu(){
+	$.ajax({
+      url: sever_addr + "/resource/queryMenu",
+      type: "post",
+      dataType: "json",
+      data: {},
+      success: function(data) {
+    	    var html = '';
+            $.each(data.data, function(index, em) {
+            	var slice;
+            	var defineId = "menu" + index;
+            	if(em.url == null || em.url == ''){
+            		slice = "<a href='javascript:void(0);' class='nav-header collapsed'  onclick=toggleMenu('"+defineId+"',this)><i class='"+em.icon+"'></i>"+em.name+"<i class='icon-chevron-up'></i></a>";
+            	}else{
+            		slice = "<a href='javascript:void(0);' class='nav-header collapsed' onclick=link('"+em.url+"',this)><i class='"+em.icon+"'></i>"+em.name+"</a>";
+            	}
+            	
+            	if(em.subset != null && em.subset.length != 0){
+            		var li='';
+           			$.each(em.subset, function(i, sub) {
+           				li += "<li><a href='#' onclick=link('"+sub.url+"',this)>"+sub.name+"</a></li>";
+           			});
+           			var ul= "<ul id='"+defineId+"' class='nav nav-list collapse'>"+ li +"</ul>";
+           			slice += ul;
+            	}
+            	
+            	html += slice;
+            });
+            $("#menu").html(html);
+      },
+      
+      error: function() {toastr.error(data.msg);}
+    });
+}
+
+//导航收缩与展开
+function toggleMenu(id,em){
+	var open = "nav nav-list in collapse";
+	var close = "nav nav-list collapse";
+	var open_icon = "nav-header collapsed";
+	var close_icon = "nav-header";
+	if($("#"+id).prop('class').indexOf('in') > -1){
+		$("#"+id).removeClass(open).addClass(close);
+		$(em).removeClass(close_icon).addClass(open_icon);
+	}else{
+		$("#"+id).removeClass(close).addClass(open);
+		$(em).removeClass(open_icon).addClass(close_icon);
+	}
+}
+
+function link(url,em){
+	$('ul').find('li').find('a').removeAttr("style");
+	$(em).css("font-weight","bold");
+	$(em).css("background-color","#E0E0E0");
+	route(url);
+}
+</script>
+</html>

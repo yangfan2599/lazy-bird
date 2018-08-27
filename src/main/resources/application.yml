@@ -1,0 +1,45 @@
+server:
+  port: 8080
+spring:
+    datasource:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/lazy-bird
+        username: root
+        password: 1q2w3e4r
+    resources:
+        static-locations: classpath:/,classpath:/static/,classpath:/pages/,classpath:/plugin/
+    mvc:
+        view:
+            suffix: .html
+    http:
+        encoding:
+            charset: utf-8
+            enabled: true
+    cache:
+        ehcache:
+            config: classpath:cache/ehcache.xml
+    # 发送邮件配置
+    mail:
+        host: smtp.qq.com
+        username: 792426043@qq.com
+        password: yf1986
+        properties:
+                  mail:
+                      smtp:
+                          auth: true
+                          starttls:
+                                 enable: true
+                                 required: true
+                                 
+# 7个级别：TRACE , DEBUG , INFO , WARN , ERROR , FATAL , OFF
+logging:
+   level:
+     root: DEBUG
+     
+mybatis:
+    mapper-locations: classpath:mapper/*.xml
+    type-aliases-package: com.lb.model
+
+
+    

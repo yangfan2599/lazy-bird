@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lb.mapper.OrganRoleMapper" >
+  <resultMap id="BaseResultMap" type="com.lb.model.OrganRole" >
+    <id column="oid" property="oid" jdbcType="BIGINT" />
+    <id column="rid" property="rid" jdbcType="BIGINT" />
+    <result column="create_date" property="createDate" jdbcType="BIGINT" />
+    <result column="creator" property="creator" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    oid, rid, create_date, creator
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.lb.model.OrganRoleKey" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_organ_role
+    where oid = #{oid,jdbcType=BIGINT}
+      and rid = #{rid,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.lb.model.OrganRoleKey" >
+    delete from sys_organ_role
+    where oid = #{oid,jdbcType=BIGINT}
+      and rid = #{rid,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.lb.model.OrganRole" >
+    insert into sys_organ_role (oid, rid, create_date, 
+      creator)
+    values (#{oid,jdbcType=BIGINT}, #{rid,jdbcType=BIGINT}, #{createDate,jdbcType=BIGINT}, 
+      #{creator,jdbcType=BIGINT})
+  </insert>
+  
+  <insert id="insertBatch">
+    insert into sys_organ_role (oid, rid, create_date, 
+      creator)
+    values
+    <foreach collection="list" item="i" index="index" separator="," >
+     (#{i.oid,jdbcType=BIGINT}, #{i.rid,jdbcType=BIGINT}, #{i.createDate,jdbcType=BIGINT}, 
+      #{i.creator,jdbcType=BIGINT})
+    </foreach>
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.lb.model.OrganRole" >
+    insert into sys_organ_role
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="oid != null" >
+        oid,
+      </if>
+      <if test="rid != null" >
+        rid,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="creator != null" >
+        creator,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="oid != null" >
+        #{oid,jdbcType=BIGINT},
+      </if>
+      <if test="rid != null" >
+        #{rid,jdbcType=BIGINT},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=BIGINT},
+      </if>
+      <if test="creator != null" >
+        #{creator,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lb.model.OrganRole" >
+    update sys_organ_role
+    <set >
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=BIGINT},
+      </if>
+      <if test="creator != null" >
+        creator = #{creator,jdbcType=BIGINT},
+      </if>
+    </set>
+    where oid = #{oid,jdbcType=BIGINT}
+      and rid = #{rid,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lb.model.OrganRole" >
+    update sys_organ_role
+    set create_date = #{createDate,jdbcType=BIGINT},
+      creator = #{creator,jdbcType=BIGINT}
+    where oid = #{oid,jdbcType=BIGINT}
+      and rid = #{rid,jdbcType=BIGINT}
+  </update>
+</mapper>

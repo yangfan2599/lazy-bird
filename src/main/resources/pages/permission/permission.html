@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+</head>
+
+<div class="search-well">
+    <form class="form-inline"> 
+        <select id="roles" class="input-xlarge" onchange="query()"></select>
+    </form>
+</div>
+
+<div class="well">
+	<table class="table">
+		<thead>
+			<tr>
+			    <th>#</th>
+				<th>资源名称</th>
+				<th>权限</th>
+			</tr>
+		</thead>
+		<tbody id="datas"></tbody>
+	</table>
+</div>
+<script>
+
+	
+	$(function(){
+		query();
+		initRoles();
+	});
+	
+	function getRid(){
+		var rid = $("#roles").val();
+		if(rid == ''){
+			return null;
+		}
+		return rid;	
+	}
+	
+	function query(){
+		var space = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+		$.ajax({
+          url: sever_addr + "/permission/queryPermission",
+          type: "post",
+          dataType: "json",
+          data: {"rid":getRid()},
+          success: function(data) {
+        	    $("#datas").empty();
+	            $.each(data.data, function(index, em) {
+	            	var tr = $("<tr id="+em.id+"></tr>");
+	            	var td1 = $("<td>"+ (index + 1) +"</td>");
+	        		var td2;
+	        		if(em.pid == null){
+	        			td2 = $("<td><i class='"+em.icon+"'></i>&nbsp;"+em.name+"</td>");
+	            	}else{
+	            		td2 = $("<td>"+space+em.name+"</td>");
+	            	}
+	        		var td3;
+	        		if(em.rid==null){
+	        			td3 = $("<td><input type='checkbox' id="+em.id+" onchange='authorize(this,"+em.id+")'/></td>");
+	            	}else{
+	            		td3 = $("<td><input type='checkbox' id="+em.id+" checked='checked' onchange='authorize(this,"+em.id+")'/></td>");
+	            	}
+	        		
+	        		var op_vi = $("");
+	        		td3.append(op_vi);
+	        		tr.append(td1);
+	        		tr.append(td2);
+	        		tr.append(td3);
+	        		$("#datas").append(tr);
+	            });
+          },
+          error: function(data) {toastr.error(data.msg);}
+        });
+	}
+	
+	function authorize(em,id){
+		if($(em).is(":checked")){
+			save(id);
+		}else{
+			remove(id);
+		}
+		
+	}
+	
+	function save(resId){
+		
+		var rid = $("#roles").val();
+		
+		if(rid == ''){
+			toastr.error("请选择角色！");
+			return;
+		}
+		var obj = new Object();
+		obj.resourceId = resId;
+		obj.roleId = rid;
+		
+		$.ajax({
+	          url: sever_addr + "/permission/save",
+	          type: "post",
+	          dataType: "json",
+	          data: obj,
+	          success: function(data) {
+	        	  resultHandler(data);
+	          },
+	          error: function(data) {
+	        	  toastr.error(data.msg);
+	          }
+	    });
+	}
+	
+    function remove(resId){
+		
+		var rid = $("#roles").val();
+		
+		if(rid == ''){
+			toastr.error("请选择角色！");
+			return;
+		}
+		
+		var obj = new Object();
+		obj.resourceId = resId;
+		obj.roleId = rid;
+		
+		$.ajax({
+	          url: sever_addr + "/permission/remove",
+	          type: "post",
+	          dataType: "json",
+	          data: obj,
+	          success: function(data) {
+	        	  resultHandler(data);
+	          },
+	          error: function(data) {
+	        	  toastr.error(data.msg);
+	          }
+	    });
+	}
+	
+	function initRoles(){
+		$.ajax({
+	          url: sever_addr + "/role/query",
+	          type: "post",
+	          dataType: "json",
+	          data: {},
+	          success: function(data) {
+	        		$("#roles").empty();
+	        		$("#roles").append("<option value=''  style='font-weight:bold'>请选择</option>");
+	  	            $.each(data.data, function(index, em) {
+	  	        		$("#roles").append("<option value='"+em.id+"'>"+em.name+"</option>");
+	  	            });
+	  	            
+	          },
+	          error: function(data) {
+	        	  toastr.error(data.msg);
+	          }
+	    });
+	}
+	
+</script>
+</html>
+
+

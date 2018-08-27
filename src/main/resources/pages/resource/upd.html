@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+</head>
+
+<div class="btn-toolbar">
+	<button class="btn btn-primary" onclick="update()">
+		<i class="icon-save"></i> 保存
+	</button>
+    <a href="#" class="btn" onclick="route('/resource/list.html')">返回</a>
+</div>
+
+<div class="well">
+	<div id="myTabContent" class="tab-content">
+		<div class="tab-pane active in" id="home">
+			<form>
+			    <label>资源名称</label> 
+				<input type="text" class="input-xlarge" id="name"> 
+				<label>所属上级</label> 
+				<input type="text"  class="input-xlarge" id="treeValue" readonly="readonly" onclick="showMenu()">
+				<div id="ztree"></div>
+				<label>icon图标</label> 
+				<input type="text" class="input-xlarge" id="icon">
+				<label>链接</label> 
+				<input type="text" class="input-xlarge" id="url">
+				<label>资源标识</label> 
+				<input type="text" class="input-xlarge" id="resource">
+				<label>资源类型</label> 
+				<select id="type" class="input-xlarge">
+			          <option value="0">请选择</option>
+			          <option value="1">导航</option>
+			          <option value="2">按钮</option>
+			    </select>
+			    <label>排序</label> 
+				<input type="text" class="input-xlarge" id="sort">
+				<label>状态 </label> 
+				<div>
+					<label>
+						<input type="radio" style="vertical-align:top;" name="enable" value="1">&nbsp;启用
+						&nbsp;&nbsp;
+						<input type="radio" style="vertical-align:top;" name="enable" value="-1">&nbsp;停用
+					</label>
+				</div>
+			    <label>备注</label>
+				<textarea rows="3" class="input-xlarge" id="remark"></textarea>
+			</form>
+		</div>
+	</div>
+</div>
+<script>
+
+    $("#ztree").load("/pages/resource/tree.html");
+	
+    $(function(){
+    	detail();
+    });
+    
+    function detail(){
+    	$.ajax({
+	          url: sever_addr + "/resource/get",
+	          type: "post",
+	          dataType: "json",
+	          data: {'id':localStorage.getItem("id")},
+	          success: function(data) {
+	        	  $("#name").val(data.data.name);
+	        	  $("#icon").val(data.data.icon);
+	        	  $("#url").val(data.data.url);
+	        	  $("#treeValue").val(data.data.parent);
+	        	  $("#resource").val(data.data.resource);
+	        	  $("#type").val(data.data.type);
+	        	  $("#sort").val(data.data.sort);
+	        	  $("#remark").val(data.data.remark);
+	        	  if(data.data.enable == true){
+	        		  radioChecked("enable","1");
+	        	  }else{
+	        		  radioChecked("enable","-1");
+	        	  }
+	          },
+	          error: function(data) {
+	        	  toastr.error(data.msg);
+	          }
+	    });
+    }
+    
+	function getData(){
+		var data = new Object();
+		data.id = localStorage.getItem("id");
+		data.name = $("#name").val();
+		var pid = $("#nodeId").val();
+		if(pid !="" && pid !=null){
+			data.pid = pid;
+		}
+		data.icon = $("#icon").val();
+		data.url = $("#url").val();
+		data.resource = $("#resource").val();
+		data.type = $("#type").val();
+		data.sort = $("#sort").val();
+		data.remark = $("#remark").val();
+		
+		if(radioVal("enable") == 1 || radioVal("enable") == "1"){
+			data.enable = true;
+		}else{
+			data.enable = false;
+		}
+		return data;
+	}
+	
+	function update(){
+		$.ajax({
+	          url: sever_addr + "/resource/modify",
+	          type: "post",
+	          dataType: "json",
+	          data: getData(),
+	          success: function(data) {
+	        	 if(resultHandler(data)) {
+	        		 route('/resource/list.html');
+		         }
+	          },
+	          error: function(data) {
+	        	  toastr.error(data.msg);
+	          }
+	    });
+	}
+</script>
+</html>
+

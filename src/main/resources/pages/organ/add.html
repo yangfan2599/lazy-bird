@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+</head>
+
+<div class="btn-toolbar">
+	<button class="btn btn-primary" onclick="save()">
+		<i class="icon-save"></i> 保存
+	</button>
+    <a href="#" class="btn" onclick="route('/organ/list.html')">返回</a>
+</div>
+
+<div class="well">
+	<div id="myTabContent" class="tab-content">
+		<div class="tab-pane active in" id="home">
+			<form id="tab">
+			    <label id="app">组织编码</label> 
+				<input type="text" class="input-xlarge" id="code"> 
+				<label>组织名称</label> 
+				<input type="text"  class="input-xlarge" id="name"> 
+				<label>所属组织</label> 
+				<input type="text"  class="input-xlarge" id="treeValue" readonly="readonly" onclick="showMenu()">
+				<div id="ztree"></div>
+			    <label>备注</label>
+				<textarea rows="3" class="input-xlarge" id="remark"></textarea>
+			</form>
+		</div>
+	</div>
+</div>
+<script>
+
+    $("#ztree").load("/pages/organ/tree.html");
+
+	function getData(){
+		var pid = $("#nodeId").val()
+		var data = new Object();
+		data.code = $("#code").val();
+		data.name = $("#name").val();
+		data.remark = $("#remark").val();
+		if(pid != null &&  pid != ''){
+			data.pid = $("#pid").val();
+		}
+		return data;
+	}
+	
+	function save(){
+		$.ajax({
+	          url: sever_addr + "/organ/save",
+	          type: "post",
+	          dataType: "json",
+	          data: getData(),
+	          success: function(data) {
+	        	  if(resultHandler(data)) {
+	        		  route('/organ/list.html');
+	        	  }
+	          },
+	          error: function() {toastr.error(data.msg);}
+	    });
+	}
+	
+</script>
+</html>
+

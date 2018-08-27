@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lb.mapper.ResourceMapper" >
+  <resultMap id="BaseResultMap" type="com.lb.model.Resource" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="parent" property="parent" jdbcType="VARCHAR" />
+    <result column="pid" property="pid" jdbcType="BIGINT" />
+    <result column="icon" property="icon" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="resource" property="resource" jdbcType="VARCHAR" />
+    <result column="sort" property="sort" jdbcType="INTEGER" />
+    <result column="enable" property="enable" jdbcType="BIT" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="creator" property="creator" jdbcType="BIGINT" />
+    <result column="modifier" property="modifier" jdbcType="BIGINT" />
+    <result column="create_date" property="createDate" jdbcType="BIGINT" />
+    <result column="modify_date" property="modifyDate" jdbcType="BIGINT" />
+    <result column="rid" property="rid" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, pid, icon, url, type, resource, sort, enable, remark, creator, modifier, 
+    create_date, modify_date
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select  
+    o.*,r.name as parent
+    from sys_resource o
+    left join sys_resource r
+	on o.pid=r.id
+    where o.id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectByUid" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select rce.*,
+           rol.id as rid 
+    from  sys_user_role usr,
+		  sys_role rol,
+		  sys_role_resource res,
+		  sys_resource rce
+	where usr.rid = rol.id 
+	      and usr.uid=#{uid,jdbcType=BIGINT} 
+	      and rol.id = res.role_id 
+	      and res.resource_id=rce.id
+	order by rce.sort asc  
+  </select>
+  <select id="selectByRid" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+	     rs.*, rr.role_id as rid
+	from
+		sys_resource rs
+	left join sys_role_resource rr ON rs.id = rr.resource_id
+	    and rr.role_id = #{rid,jdbcType=BIGINT} 
+	order by rs.sort asc  
+  </select>
+  <select id="selectByPage" resultMap="BaseResultMap" parameterType="com.lb.model.Resource" >
+    select  
+    o.*,r.name as parent
+    from sys_resource o
+    left join sys_resource r
+	on o.pid=r.id
+    <if test="name !=null  and name != '' ">  
+    	where o.name like CONCAT('%',#{name},'%')
+    </if>
+    order by o.sort asc
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" parameterType="com.lb.model.Resource" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_resource order by sort asc
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from sys_resource
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.lb.model.Resource" >
+    insert into sys_resource (id, name, pid, 
+      icon, url, type, resource, 
+      sort, enable, remark, creator, 
+      modifier, create_date, modify_date
+      )
+    values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{pid,jdbcType=BIGINT}, 
+      #{icon,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{resource,jdbcType=VARCHAR}, 
+      #{sort,jdbcType=INTEGER}, #{enable,jdbcType=BIT}, #{remark,jdbcType=VARCHAR}, #{creator,jdbcType=BIGINT}, 
+      #{modifier,jdbcType=BIGINT}, #{createDate,jdbcType=BIGINT}, #{modifyDate,jdbcType=BIGINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.lb.model.Resource" >
+    insert into sys_resource
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="pid != null" >
+        pid,
+      </if>
+      <if test="icon != null" >
+        icon,
+      </if>
+      <if test="url != null" >
+        url,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="resource != null" >
+        resource,
+      </if>
+      <if test="sort != null" >
+        sort,
+      </if>
+      <if test="enable != null" >
+        enable,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="creator != null" >
+        creator,
+      </if>
+      <if test="modifier != null" >
+        modifier,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="modifyDate != null" >
+        modify_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="pid != null" >
+        #{pid,jdbcType=BIGINT},
+      </if>
+      <if test="icon != null" >
+        #{icon,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="resource != null" >
+        #{resource,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null" >
+        #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="enable != null" >
+        #{enable,jdbcType=BIT},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="creator != null" >
+        #{creator,jdbcType=BIGINT},
+      </if>
+      <if test="modifier != null" >
+        #{modifier,jdbcType=BIGINT},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=BIGINT},
+      </if>
+      <if test="modifyDate != null" >
+        #{modifyDate,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lb.model.Resource" >
+    update sys_resource
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="pid != null" >
+        pid = #{pid,jdbcType=BIGINT},
+      </if>
+      <if test="icon != null" >
+        icon = #{icon,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="resource != null" >
+        resource = #{resource,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null" >
+        sort = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="enable != null" >
+        enable = #{enable,jdbcType=BIT},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="creator != null" >
+        creator = #{creator,jdbcType=BIGINT},
+      </if>
+      <if test="modifier != null" >
+        modifier = #{modifier,jdbcType=BIGINT},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=BIGINT},
+      </if>
+      <if test="modifyDate != null" >
+        modify_date = #{modifyDate,jdbcType=BIGINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lb.model.Resource" >
+    update sys_resource
+    set name = #{name,jdbcType=VARCHAR},
+      pid = #{pid,jdbcType=BIGINT},
+      icon = #{icon,jdbcType=VARCHAR},
+      url = #{url,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      resource = #{resource,jdbcType=VARCHAR},
+      sort = #{sort,jdbcType=INTEGER},
+      enable = #{enable,jdbcType=BIT},
+      remark = #{remark,jdbcType=VARCHAR},
+      creator = #{creator,jdbcType=BIGINT},
+      modifier = #{modifier,jdbcType=BIGINT},
+      create_date = #{createDate,jdbcType=BIGINT},
+      modify_date = #{modifyDate,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

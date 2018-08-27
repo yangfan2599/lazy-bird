@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+</head>
+
+<div class="search-well">
+    <form class="form-inline"> 
+    	<button class="btn btn-primary" onclick="route('/role/add.html')">
+		<i class="icon-plus"></i> 添加
+	    </button>
+        <input class="input-large" placeholder="角色名称" type="text" id="name">
+        <button class="btn" type="button" onclick="query()"><i class="icon-search"></i> 搜索</button>
+    </form>
+</div>
+
+<div class="well">
+	<table class="table">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>角色名称</th>
+				<th>状态</th>
+				<th>备注</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody id="datas"></tbody>
+	</table>
+</div>
+<div class="pagination" id="page"></div>
+<div id="dialog"></div>
+<script>
+
+	$("#page").load("/page.html");
+	$("#dialog").load("../dialog.html");
+	
+	$(function(){
+		query();
+	});
+	
+	function condition(){
+		var param = new Object();
+		param.name = $("#name").val();
+		return param;
+	}
+	
+	function query(){
+		$.ajax({
+          url: sever_addr + "/role/query",
+          type: "post",
+          dataType: "json",
+          data: condition(),
+          success: function(data) {
+        	    $("#datas").empty();
+	            $.each(data.data, function(index, em) {
+	            	var tr = $("<tr id="+em.id+"></tr>");
+	            	var td1 = $("<td>"+ (index + 1) +"</td>");
+	        		var td2 = $("<td>"+em.name+"</td>");
+	        		var td3 = $("<td>"+(em.enable == true ? "启用" : "停用")+"</td>");
+	        		var td4 = $("<td>"+em.remark+"</td>");
+	        		var td5 = $("<td></td>");
+	        		var op_vi = $("<a href='javascript:void(0)' onclick='detail("+em.id+")' class='operations'><i class='icon-pencil'></i> &nbsp;</a>");
+	        		var op_rm = $("<a href='javascript:void(0)' onclick='show("+em.id+")' class='operations'><i class='icon-remove'></i> &nbsp;</a> ");
+	        		td5.append(op_vi);
+	        		td5.append(op_rm);
+	        		tr.append(td1);
+	        		tr.append(td2);
+	        		tr.append(td3);
+	        		tr.append(td4);
+	        		tr.append(td5);
+	        		$("#datas").append(tr);
+	            });
+          },
+          error: function(data) {toastr.error(data.msg);}
+        });
+	}
+	
+	function detail(id){
+		localStorage.setItem("id",id);
+		route('/role/upd.html');
+	}
+	
+	function show(id){
+		localStorage.setItem("select_id",id);
+		localStorage.setItem("routeDel","/role/remove");
+		$('#myModal').modal('show');
+	}
+	
+</script>
+</html>
+
+

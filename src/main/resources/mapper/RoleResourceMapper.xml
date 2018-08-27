@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lb.mapper.RoleResourceMapper" >
+  <resultMap id="BaseResultMap" type="com.lb.model.RoleResource" >
+    <id column="resource_id" property="resourceId" jdbcType="BIGINT" />
+    <id column="role_id" property="roleId" jdbcType="BIGINT" />
+    <result column="creator" property="creator" jdbcType="BIGINT" />
+    <result column="create_date" property="createDate" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    resource_id, role_id, creator, create_date
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.lb.model.RoleResourceKey" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_role_resource
+    where resource_id = #{resourceId,jdbcType=BIGINT}
+      and role_id = #{roleId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.lb.model.RoleResourceKey" >
+    delete from sys_role_resource
+    where resource_id = #{resourceId,jdbcType=BIGINT}
+      and role_id = #{roleId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByRid" parameterType="java.lang.Long" >
+    delete from sys_role_resource
+    where role_id = #{rid,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.lb.model.RoleResource" >
+    insert into sys_role_resource (resource_id, role_id, creator, 
+      create_date)
+    values (#{resourceId,jdbcType=BIGINT}, #{roleId,jdbcType=BIGINT}, #{creator,jdbcType=BIGINT}, 
+      #{createDate,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertBatch" parameterType="com.lb.model.RoleResource" >
+     insert into sys_role_resource 
+	    (resource_id, role_id, 
+	     creator,create_date)
+     values
+    <foreach collection="rrs" separator="," index="index" item="i">
+        (#{i.resourceId,jdbcType=BIGINT}, #{i.roleId,jdbcType=BIGINT}, 
+          #{i.creator,jdbcType=BIGINT},#{i.createDate,jdbcType=BIGINT})
+    </foreach>
+  </insert>
+  <insert id="insertSelective" parameterType="com.lb.model.RoleResource" >
+    insert into sys_role_resource
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="resourceId != null" >
+        resource_id,
+      </if>
+      <if test="roleId != null" >
+        role_id,
+      </if>
+      <if test="creator != null" >
+        creator,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="resourceId != null" >
+        #{resourceId,jdbcType=BIGINT},
+      </if>
+      <if test="roleId != null" >
+        #{roleId,jdbcType=BIGINT},
+      </if>
+      <if test="creator != null" >
+        #{creator,jdbcType=BIGINT},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lb.model.RoleResource" >
+    update sys_role_resource
+    <set >
+      <if test="creator != null" >
+        creator = #{creator,jdbcType=BIGINT},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=BIGINT},
+      </if>
+    </set>
+    where resource_id = #{resourceId,jdbcType=BIGINT}
+      and role_id = #{roleId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lb.model.RoleResource" >
+    update sys_role_resource
+    set creator = #{creator,jdbcType=BIGINT},
+      create_date = #{createDate,jdbcType=BIGINT}
+    where resource_id = #{resourceId,jdbcType=BIGINT}
+      and role_id = #{roleId,jdbcType=BIGINT}
+  </update>
+</mapper>

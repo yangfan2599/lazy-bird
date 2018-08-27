@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lb.mapper.OrganMapper" >
+
+  <resultMap id="BaseResultMap" type="com.lb.model.Organ" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="pid" property="pid" jdbcType="BIGINT" />
+    <result column="parent" property="parent" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="creator" property="creator" jdbcType="BIGINT" />
+    <result column="create_date" property="createDate" jdbcType="BIGINT" />
+    <result column="modifier" property="modifier" jdbcType="BIGINT" />
+    <result column="modify_date" property="modifyDate" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, code, name, pid,remark, creator, create_date, modifier, modify_date
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select o.*,p.name as parent 
+    from sys_organ o 
+	left join sys_organ p
+	on o.pid=p.id
+    where o.id = #{id,jdbcType=BIGINT}
+  </select>
+  
+  <select id="selectByRole" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select o.* from sys_organ o,sys_organ_role ro
+    where ro.rid=#{rid,jdbcType=BIGINT} and o.id=ro.oid
+  </select>
+  
+  <select id="countSubset" resultType="java.lang.Integer" parameterType="java.lang.Long" >
+    select count(*) from sys_organ where pid=#{id,jdbcType=BIGINT}
+  </select>
+  
+  <select id="selectByPage" resultMap="BaseResultMap" parameterType="com.lb.model.Organ" >
+    select o.*,p.name as parent 
+    from sys_organ o 
+	left join sys_organ p
+	on o.pid=p.id
+    <if test="name !=null  and name != '' ">  
+    	where o.name like CONCAT('%',#{name},'%')
+    </if>
+  </select>
+  
+  <select id="selectOptions" resultMap="BaseResultMap" parameterType="com.lb.model.Organ" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_organ
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from sys_organ
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.lb.model.Organ" >
+    insert into sys_organ (id, code, name, 
+                          pid,remark, creator, 
+                          create_date,modifier, modify_date)
+    values (#{id,jdbcType=BIGINT}, #{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+            #{pid,jdbcType=BIGINT},#{remark,jdbcType=VARCHAR}, #{creator,jdbcType=BIGINT}, 
+            #{createDate,jdbcType=BIGINT},#{modifier,jdbcType=BIGINT}, #{modifyDate,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lb.model.Organ" >
+    insert into sys_organ
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="code != null" >
+        code,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="pid != null" >
+        pid,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="creator != null" >
+        creator,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="modifier != null" >
+        modifier,
+      </if>
+      <if test="modifyDate != null" >
+        modify_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="pid != null" >
+        #{pid,jdbcType=BIGINT},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="creator != null" >
+        #{creator,jdbcType=BIGINT},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=BIGINT},
+      </if>
+      <if test="modifier != null" >
+        #{modifier,jdbcType=BIGINT},
+      </if>
+      <if test="modifyDate != null" >
+        #{modifyDate,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lb.model.Organ" >
+    update sys_organ
+    <set >
+      <if test="code != null" >
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="pid != null" >
+        pid = #{pid,jdbcType=BIGINT},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="creator != null" >
+        creator = #{creator,jdbcType=BIGINT},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=BIGINT},
+      </if>
+      <if test="modifier != null" >
+        modifier = #{modifier,jdbcType=BIGINT},
+      </if>
+      <if test="modifyDate != null" >
+        modify_date = #{modifyDate,jdbcType=BIGINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lb.model.Organ" >
+    update sys_organ
+    set code = #{code,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      pid = #{pid,jdbcType=BIGINT},
+      remark = #{remark,jdbcType=VARCHAR},
+      creator = #{creator,jdbcType=BIGINT},
+      create_date = #{createDate,jdbcType=BIGINT},
+      modifier = #{modifier,jdbcType=BIGINT},
+      modify_date = #{modifyDate,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>
